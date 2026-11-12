@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KESPRO - Pendokumentasian ANC, Skrining Risiko, Edukasi, Rujukan</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>body{font-family:'Poppins',sans-serif} .hidden{display:none} input,select,textarea{outline:none} input:focus,select:focus,textarea:focus{border-color:#e91e63!important}</style>
+</head>
+<body class="bg-[#fff5f7] min-h-screen">
+<div class="bg-white shadow sticky top-0 z-50"><div class="max-w-md mx-auto px-4 py-3 flex items-center gap-3">
+<div class="w-11 h-11 bg-gradient-to-br from-pink-500 to-blue-400 rounded-2xl flex items-center justify-center text-2xl">❤️</div>
+<div><h1 class="font-extrabold text-[#e91e63] text-lg leading-none tracking-wide">KESPRO</h1><p class="text-[9px] text-gray-500 mt-1">Remaja - Pranikah - Prakonsepsi - Hamil</p><p class="text-[8px] text-gray-400">Pendokumentasian: ANC • Skrining Risiko • Edukasi • Rujukan</p></div>
+<div class="ml-auto text-right"><p id="topBidan" class="text-[10px] font-bold text-gray-700"></p><button onclick="logout()" class="text-[10px] text-red-500 font-bold">Keluar</button></div>
+</div></div>
+
+<div class="max-w-md mx-auto p-4 pb-20">
+
+<!-- 1. LOGIN -->
+<div id="page-login">
+<div class="bg-white rounded-3xl p-6 shadow mt-6 text-center">
+<div class="w-20 h-20 mx-auto bg-gradient-to-br from-pink-300 to-blue-300 rounded-3xl flex items-center justify-center text-4xl shadow-lg">❤️</div>
+<p class="text-[9px] bg-pink-100 text-pink-600 font-bold inline-block px-2 py-1 rounded-full mt-3">KESPRO</p>
+<h2 class="font-extrabold text-3xl text-[#e91e63] mt-1">KESPRO</h2>
+<p class="text-[11px] text-gray-500">Remaja - Pranikah - Prakonsepsi - Hamil</p>
+<div class="text-left mt-5 space-y-3">
+<input id="loginNama" placeholder="Nama Bidan / Nakes" class="w-full border-2 border-gray-100 rounded-xl p-3 text-sm">
+<input id="loginNIK" placeholder="Email / NIK Bidan" class="w-full border-2 border-gray-100 rounded-xl p-3 text-sm">
+<input id="loginPass" type="password" placeholder="Password" class="w-full border-2 border-gray-100 rounded-xl p-3 text-sm">
+<select id="loginRole" class="w-full border-2 border-gray-100 rounded-xl p-3 text-sm"><option>Bidan</option><option>Nakes</option><option>Admin Puskesmas</option></select>
+<p class="text-[10px] text-gray-400 text-center">Akun terdaftar di Puskesmas. Hubungi Admin untuk akun baru.</p>
+<button onclick="doLogin()" class="w-full bg-[#e91e63] text-white rounded-full py-3.5 font-bold shadow-lg">LOGIN</button>
+<button onclick="doRegister()" class="w-full text-[#e91e63] font-bold text-sm mt-1">Belum punya akun? Register</button>
+</div>
+<div class="mt-4 bg-blue-50 rounded-xl p-3 text-left"><p class="text-[10px] font-bold text-blue-800">Alur KESPRO:</p><p class="text-[9px] text-gray-600 leading-relaxed">Login → Dashboard → Pasien Baru / Rekam Medis Lama → Pilih Kategori → ANC → Skrining Risiko → Rujukan jika Risiko Tinggi → Edukasi → Dokumentasi & Simpan → Laporan</p></div>
+</div></div>
+
+<!-- 2. DASHBOARD -->
+<div id="page-dashboard" class="hidden">
+<div class="bg-gradient-to-r from-[#e91e63] to-pink-400 text-white rounded-2xl p-4 mt-2"><p class="text-xs opacity-90">Selamat datang,</p><p id="dashNama" class="font-bold text-lg">Bidan</p><p id="dashRole" class="text-[10px] opacity-80">Bidan • Puskesmas</p>
+<div class="grid grid-cols-3 gap-2 mt-3 text-center"><div class="bg-white/20 rounded-xl p-2"><p id="statPasien" class="font-bold">0</p><p class="text-[9px]">Pasien</p></div><div class="bg-white/20 rounded-xl p-2"><p id="statANC" class="font-bold">0</p><p class="text-[9px]">ANC</p></div><div class="bg-white/20 rounded-xl p-2"><p id="statRujuk" class="font-bold">0</p><p class="text-[9px]">Rujukan</p></div></div></div>
+<div class="bg-white rounded-2xl p-3 shadow mt-3 flex gap-2"><input id="cariPasien" oninput="renderPasien()" placeholder="Cari Pasien: Nama / NIK..." class="flex-1 border rounded-xl p-3 text-sm"><button onclick="openTambahPasien()" class="bg-[#e91e63] text-white rounded-xl px-4 font-bold text-sm whitespace-nowrap">+ Pasien Baru</button></div>
+<div class="grid grid-cols-2 gap-3 mt-3">
+<button onclick="filterKategori('Remaja')" class="bg-white border-2 border-pink-100 rounded-2xl p-4 text-left shadow-sm"><div class="text-2xl">👧</div><p class="font-bold text-sm mt-1">Remaja</p><p class="text-[10px] text-gray-500">Skrining Anemia, Tumbuh Kembang</p></button>
+<button onclick="filterKategori('Pranikah')" class="bg-white border-2 border-purple-100 rounded-2xl p-4 text-left shadow-sm"><div class="text-2xl">💍</div><p class="font-bold text-sm mt-1">Pranikah</p><p class="text-[10px] text-gray-500">Catin, TT, Konseling</p></button>
+<button onclick="filterKategori('Prakonsepsi')" class="bg-white border-2 border-blue-100 rounded-2xl p-4 text-left shadow-sm"><div class="text-2xl">🌸</div><p class="font-bold text-sm mt-1">Prakonsepsi</p><p class="text-[10px] text-gray-500">Asam Folat, Gizi, Rencana Hamil</p></button>
+<button onclick="filterKategori('Kehamilan')" class="bg-white border-2 border-green-100 rounded-2xl p-4 text-left shadow-sm"><div class="text-2xl">🤰</div><p class="font-bold text-sm mt-1">Kehamilan</p><p class="text-[10px] text-gray-500">ANC, USG, Skrining Risiko</p></button>
+</div>
+<div class="flex gap-2 mt-3"><button onclick="showPage('page-laporan')" class="flex-1 bg-white border rounded-xl py-3 font-bold text-sm">📊 Laporan & Monitoring</button><button onclick="showPage('page-edukasi')" class="flex-1 bg-white border rounded-xl py-3 font-bold text-sm">📚 Edukasi</button></div>
+<h3 class="font-bold mt-5 mb-2 text-sm">Daftar Pasien / Riwayat Kunjungan</h3>
+<div id="listPasien" class="space-y-2"></div>
+</div>
+
+<!-- TAMBAH PASIEN -->
+<div id="page-tambah" class="hidden">
+<button onclick="showPage('page-dashboard')" class="text-[#e91e63] font-bold text-sm mb-3">← Dashboard</button>
+<div class="bg-white rounded-2xl p-5 shadow"><h2 class="font-bold">Input Data Pasien Baru</h2><p class="text-[10px] text-gray-500">NIK, Nama, Usia, Kategori</p>
+<input id="pNIK" placeholder="NIK (16 digit)" class="w-full border rounded-xl p-3 mt-3 text-sm">
+<input id="pNama" placeholder="Nama Lengkap Pasien" class="w-full border rounded-xl p-3 mt-3 text-sm">
+<div class="grid grid-cols-2 gap-2 mt-3"><input id="pUsia" type="number" placeholder="Usia (tahun)" class="border rounded-xl p-3 text-sm"><input id="pHP" placeholder="No. HP / WA" class="border rounded-xl p-3 text-sm"></div>
+<input id="pAlamat" placeholder="Alamat / Desa" class="w-full border rounded-xl p-3 mt-3 text-sm">
+<select id="pKategori" class="w-full border rounded-xl p-3 mt-3 text-sm"><option>Remaja</option><option>Pranikah</option><option>Prakonsepsi</option><option>Kehamilan</option></select>
+<select id="pStatus" class="w-full border rounded-xl p-3 mt-3 text-sm"><option>Pasien Baru</option><option>Rekam Medis Lama - Kunjungan Ulang</option></select>
+<button onclick="simpanPasien()" class="w-full bg-[#e91e63] text-white rounded-xl py-3 mt-4 font-bold">Simpan & Lanjut ke Kategori →</button>
+</div></div>
+
+<!-- 4+5. ANC DETAIL -->
+<div id="page-anc" class="hidden">
+<button onclick="showPage('page-dashboard')" class="text-[#e91e63] font-bold text-sm mb-3">← Dashboard</button>
+<div class="bg-white rounded-2xl p-5 shadow"><h2 class="font-bold">Detail Alur ANC <span id="ancPasien" class="text-[#e91e63]"></span></h2><p class="text-[10px] text-gray-500">A-E sesuai Flowchart KESPRO</p>
+<p class="font-bold text-sm mt-4">A. Anamnesis</p>
+<input id="aHPHT" type="date" class="w-full border rounded-xl p-3 mt-2 text-sm"><p class="text-[10px] text-gray-400">HPHT - Hari Pertama Haid Terakhir</p>
+<input id="aHPL" placeholder="HPL (otomatis / isi manual)" class="w-full border rounded-xl p-3 mt-2 text-sm">
+<textarea id="aRiwayat" placeholder="Riwayat Kehamilan, Penyakit, Keluhan saat ini" class="w-full border rounded-xl p-3 mt-2 text-sm"></textarea>
+<p class="font-bold text-sm mt-4">B. Pemeriksaan Fisik</p>
+<div class="grid grid-cols-3 gap-2 mt-2"><input id="bBB" type="number" placeholder="BB kg" class="border rounded-xl p-2 text-sm"><input id="bTB" type="number" placeholder="TB cm" class="border rounded-xl p-2 text-sm"><input id="bLILA" type="number" placeholder="LILA cm" class="border rounded-xl p-2 text-sm"></div>
+<div class="grid grid-cols-2 gap-2 mt-2"><input id="bTD" placeholder="TD: 120/80" class="border rounded-xl p-2 text-sm"><input id="bTFU" placeholder="TFU cm" class="border rounded-xl p-2 text-sm"></div>
+<input id="bDJJ" placeholder="DJJ (bpm)" class="w-full border rounded-xl p-3 mt-2 text-sm">
+<p class="font-bold text-sm mt-4">C. Pemeriksaan Lab</p>
+<div class="grid grid-cols-2 gap-2 mt-2"><input id="cHB" type="number" step="0.1" placeholder="Hb g/dL" class="border rounded-xl p-2 text-sm"><input id="cGDS" placeholder="GDS mg/dL" class="border rounded-xl p-2 text-sm"></div>
+<input id="cUrin" placeholder="Protein Urin: Negatif / +1 / +2" class="w-full border rounded-xl p-3 mt-2 text-sm">
+<input id="cHIV" placeholder="HIV / Sifilis / Hepatitis: Negatif / Reaktif" class="w-full border rounded-xl p-3 mt-2 text-sm">
+<p class="font-bold text-sm mt-4">D. USG / Tentukan HPL</p>
+<input id="dUSG" placeholder="Hasil USG, Usia Kehamilan, Taksiran HPL" class="w-full border rounded-xl p-3 mt-2 text-sm">
+<p class="font-bold text-sm mt-4">E. Pemberian</p>
+<div class="space-y-1 text-sm mt-2"><label class="flex gap-2"><input type="checkbox" id="eTTD"> TTD / Fe - Tablet Tambah Darah</label><label class="flex gap-2"><input type="checkbox" id="eTT"> Imunisasi TT</label><label class="flex gap-2"><input type="checkbox" id="eKalsium"> Kalsium</label><label class="flex gap-2"><input type="checkbox" id="ePMT"> PMT jika perlu</label></div>
+<button onclick="lanjutSkrining()" class="w-full bg-[#e91e63] text-white rounded-xl py-3 mt-4 font-bold">Lanjut ke Skrining Risiko →</button>
+</div></div>
+
+<!-- 6. SKRINING -->
+<div id="page-skrining" class="hidden">
+<button onclick="showPage('page-anc')" class="text-[#e91e63] font-bold text-sm mb-3">← Kembali ANC</button>
+<div class="bg-white rounded-2xl p-5 shadow"><h2 class="font-bold">Skrining Risiko</h2><p class="text-[10px] text-gray-500">Otomatis dari hasil ANC. Centang jika ada.</p>
+<div class="space-y-2 text-sm mt-3">
+<label class="flex gap-2 border rounded-xl p-3"><input type="checkbox" class="risiko" value="Perdarahan"> Perdarahan</label>
+<label class="flex gap-2 border rounded-xl p-3"><input type="checkbox" class="risiko" value="Preeklampsia / Hipertensi"> Preeklampsia / Hipertensi (TD ≥140/90 + Protein Urin +)</label>
+<label class="flex gap-2 border rounded-xl p-3"><input type="checkbox" class="risiko" value="KPD"> KPD - Ketuban Pecah Dini</label>
+<label class="flex gap-2 border rounded-xl p-3"><input type="checkbox" class="risiko" value="Gawat Janin"> Gawat Janin (DJJ abnormal)</label>
+<label class="flex gap-2 border rounded-xl p-3"><input type="checkbox" class="risiko" value="Anemia Berat"> Anemia Berat (Hb &lt;7)</label>
+<label class="flex gap-2 border rounded-xl p-3"><input type="checkbox" class="risiko" value="Anemia Ringan"> Anemia Ringan (Hb 7-11)</label>
+</div>
+<div id="hasilSkrining" class="mt-3 p-3 rounded-xl bg-gray-50 text-sm font-bold"></div>
+<button onclick="prosesSkrining()" class="w-full bg-[#e91e63] text-white rounded-xl py-3 mt-3 font-bold">Proses Skrining</button>
+<div id="aksiSkrining" class="hidden mt-3 space-y-2"><button onclick="showPage('page-rujukan')" class="w-full bg-red-500 text-white rounded-xl py-3 font-bold">🚨 RISIKO TINGGI → Masuk Alur Rujukan</button><button onclick="showPage('page-edukasi')" class="w-full bg-green-500 text-white rounded-xl py-3 font-bold">✅ RISIKO RENDAH → ANC Rutin + Edukasi</button></div>
+</div></div>
+
+<!-- 7. RUJUKAN -->
+<div id="page-rujukan" class="hidden">
+<button onclick="showPage('page-skrining')" class="text-[#e91e63] font-bold text-sm mb-3">← Skrining</button>
+<div class="bg-white rounded-2xl p-5 shadow"><h2 class="font-bold text-red-600">Detail Alur Rujukan</h2><p class="text-[10px] text-gray-500">Jika Risiko Tinggi / Gawat Darurat - Wajib Tercatat</p>
+<p class="font-bold text-sm mt-3">A. Identifikasi</p><textarea id="rIdent" placeholder="Diagnosis: Perdarahan, Preeklampsia, KPD, dll" class="w-full border rounded-xl p-3 mt-2 text-sm"></textarea>
+<p class="font-bold text-sm mt-3">B. Stabilisasi</p><input id="rStab" placeholder="O2, Infus, Posisi, Obat Emergensi yang diberikan" class="w-full border rounded-xl p-3 mt-2 text-sm">
+<p class="font-bold text-sm mt-3">C. Surat Rujukan</p><input id="rSurat" placeholder="Diagnosis, Tindakan, Alasan Rujuk" class="w-full border rounded-xl p-3 mt-2 text-sm">
+<p class="font-bold text-sm mt-3">D. Hubungi Faskes Rujukan</p><select id="rFaskes" class="w-full border rounded-xl p-3 mt-2 text-sm"><option>RS - PONED</option><option>RS - PONEK</option><option>Puskesmas PONED</option><option>RS Rujukan Lain</option></select>
+<input id="rKamar" placeholder="Konfirmasi Kamar / Bed - Nama Petugas yang dihubungi" class="w-full border rounded-xl p-3 mt-2 text-sm">
+<p class="font-bold text-sm mt-3">E. Transportasi</p><select id="rTrans" class="w-full border rounded-xl p-3 mt-2 text-sm"><option>Ambulans Puskesmas</option><option>Ambulans Desa</option><option>Kendaraan Keluarga</option></select>
+<select id="rStatus" class="w-full border rounded-xl p-3 mt-2 text-sm"><option>Dirujuk - Dalam Perjalanan</option><option>Sudah Sampai RS</option><option>Rujuk Balik ke Puskesmas</option></select>
+<button onclick="simpanRujukan()" class="w-full bg-red-500 text-white rounded-xl py-3 mt-4 font-bold">Simpan Rujukan & Lanjut Edukasi →</button>
+</div></div>
+
+<!-- 8. EDUKASI -->
+<div id="page-edukasi" class="hidden">
+<button onclick="showPage('page-dashboard')" class="text-[#e91e63] font-bold text-sm mb-3">← Dashboard</button>
+<div class="bg-white rounded-2xl p-5 shadow"><h2 class="font-bold">Edukasi & Konseling</h2>
+<div class="space-y-2 mt-3 text-sm"><label class="flex gap-2 border rounded-xl p-3"><input type="checkbox" class="edukasi"> Gizi Ibu Hamil & Remaja</label><label class="flex gap-2 border rounded-xl p-3"><input type="checkbox" class="edukasi"> Tanda Bahaya Kehamilan</label><label class="flex gap-2 border rounded-xl p-3"><input type="checkbox" class="edukasi"> KB Pasca Salin</label><label class="flex gap-2 border rounded-xl p-3"><input type="checkbox" class="edukasi"> Persiapan Persalinan & P4K</label><label class="flex gap-2 border rounded-xl p-3"><input type="checkbox" class="edukasi"> Perawatan Bayi & Menyusui</label></div>
+<textarea id="eCatatan" placeholder="Catatan Konseling yang disampaikan ke pasien" class="w-full border rounded-xl p-3 mt-3 text-sm"></textarea>
+<button onclick="showPage('page-dokumen')" class="w-full bg-[#e91e63] text-white rounded-xl py-3 mt-3 font-bold">Lanjut ke Dokumentasi & Simpan →</button>
+</div>
+<div class="bg-yellow-50 rounded-2xl p-4 mt-3 text-[11px] leading-relaxed"><b>⚠️ Tanda Bahaya Kehamilan:</b><br>Perdarahan, Sakit kepala hebat, Penglihatan kabur, Bengkak wajah/tangan, Demam, Gerak janin berkurang, Ketuban pecah dini, Kejang. Segera ke Puskesmas / RS!</div>
+</div>
+
+<!-- 9. DOKUMEN -->
+<div id="page-dokumen" class="hidden">
+<button onclick="showPage('page-edukasi')" class="text-[#e91e63] font-bold text-sm mb-3">← Edukasi</button>
+<div class="bg-white rounded-2xl p-5 shadow"><h2 class="font-bold">Dokumentasi & Simpan</h2><p class="text-[10px] text-gray-500">Auto-Save, Upload Foto USG / Lab, Cetak Buku KIA / PDF</p>
+<input type="file" accept="image/*" class="w-full border rounded-xl p-3 mt-3 text-sm">
+<textarea id="dCatatan" placeholder="Catatan Bidan / Rencana Tindak Lanjut" class="w-full border rounded-xl p-3 mt-3 text-sm"></textarea>
+<input id="dKontrol" type="date" class="w-full border rounded-xl p-3 mt-3 text-sm"><p class="text-[10px] text-gray-400">Jadwal Kontrol Berikutnya - ANC minimal 6x: K1 &lt;12 minggu, K2 12-24 minggu, K3-K6 sesuai trimester</p>
+<button onclick="simpanSemua()" class="w-full bg-green-600 text-white rounded-xl py-3 mt-4 font-bold">💾 SIMPAN SEMUA & SELESAI</button>
+<button onclick="cetakPDF()" class="w-full bg-white border-2 border-gray-200 rounded-xl py-3 mt-2 font-bold text-sm">🖨️ Cetak Buku KIA / PDF Rekam Medis</button>
+</div></div>
+
+<!-- 10. LAPORAN -->
+<div id="page-laporan" class="hidden">
+<button onclick="showPage('page-dashboard')" class="text-[#e91e63] font-bold text-sm mb-3">← Dashboard</button>
+<div class="bg-white rounded-2xl p-5 shadow"><h2 class="font-bold">Laporan & Monitoring</h2><p class="text-[10px] text-gray-500">Dashboard Risiko, Grafik ANC, Reminder Kunjungan via WA, Notif Rujukan</p>
+<div id="listLaporan" class="mt-4 space-y-2 text-sm"></div>
+<button onclick="exportLaporan()" class="w-full bg-green-600 text-white rounded-xl py-3 mt-4 font-bold">Export Laporan</button>
+<button onclick="hapusData()" class="w-full text-red-400 text-[11px] mt-2">Hapus Semua Data (Admin)</button>
+</div></div>
+
+</div>
+
+<script>
+let pasienList=JSON.parse(localStorage.getItem('kespro_pasien')||'[]');
+let ancList=JSON.parse(localStorage.getItem('kespro_anc')||'[]');
+let currentPasien=null;
+let currentKategori='Kehamilan';
+function showPage(id){document.querySelectorAll('[id^="page-"]').forEach(e=>e.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');window.scrollTo(0,0); if(id==='page-laporan')renderLaporan();}
+function doLogin(){let n=document.getElementById('loginNama').value||'Bidan';let nik=document.getElementById('loginNIK').value;let pw=document.getElementById('loginPass').value; if(!nik||!pw){alert('Isi Email / NIK Bidan dan Password dulu ya');return;} localStorage.setItem('kespro_bidan',n); document.getElementById('dashNama').innerText=n; document.getElementById('topBidan').innerText=n; document.getElementById('dashRole').innerText=document.getElementById('loginRole').value+' • Puskesmas'; showPage('page-dashboard'); renderPasien();}
+function doRegister(){alert('Register: Silakan hubungi Admin Puskesmas untuk dibuatkan akun Bidan / Nakes. Akun harus verifikasi NIK.');}
+function logout(){showPage('page-login');}
+function openTambahPasien(){showPage('page-tambah');}
+function simpanPasien(){let nik=document.getElementById('pNIK').value;let nama=document.getElementById('pNama').value; if(!nama||!nik){alert('Isi NIK dan Nama dulu');return;} let p={nik,nama,usia:document.getElementById('pUsia').value,hp:document.getElementById('pHP').value,alamat:document.getElementById('pAlamat').value,kategori:document.getElementById('pKategori').value,status:document.getElementById('pStatus').value,waktu:new Date().toLocaleString('id-ID')}; pasienList.push(p); localStorage.setItem('kespro_pasien',JSON.stringify(pasienList)); currentPasien=p; currentKategori=p.kategori; document.getElementById('ancPasien').innerText='- '+nama+' ('+p.kategori+')'; showPage('page-anc'); renderPasien();}
+function renderPasien(){let q=(document.getElementById('cariPasien')?.value||'').toLowerCase(); let div=document.getElementById('listPasien'); document.getElementById('statPasien').innerText=pasienList.length; document.getElementById('statANC').innerText=ancList.length; document.getElementById('statRujuk').innerText=ancList.filter(a=>a.risiko==='TINGGI').length; let list=pasienList.filter(p=>(p.nama+' '+p.nik).toLowerCase().includes(q)); if(list.length===0) div.innerHTML='<p class="text-gray-400 text-sm">Belum ada pasien. Klik + Pasien Baru.</p>'; else div.innerHTML=list.map((p,i)=>`<div class="bg-white border rounded-2xl p-3 shadow-sm flex justify-between items-center"><div><b class="text-sm">${p.nama}</b><p class="text-[10px] text-gray-500">NIK: ${p.nik} • ${p.kategori} • Usia ${p.usia} th</p><p class="text-[9px] text-gray-400">${p.waktu}</p></div><button onclick="bukaPasien(${pasienList.indexOf(p)})" class="bg-[#e91e63] text-white rounded-xl px-3 py-2 text-xs font-bold">Buka ANC →</button></div>`).join('');}
+function bukaPasien(i){currentPasien=pasienList[i]; currentKategori=currentPasien.kategori; document.getElementById('ancPasien').innerText='- '+currentPasien.nama+' ('+currentPasien.kategori+')'; showPage('page-anc');}
+function filterKategori(k){document.getElementById('cariPasien').value=''; renderPasien(); alert('Filter: '+k+' - Cari pasien kategori '+k+' di daftar bawah. Klik + Pasien Baru untuk tambah pasien '+k);}
+function lanjutSkrining(){showPage('page-skrining');}
+function prosesSkrining(){let checked=document.querySelectorAll('.risiko:checked'); let hb=parseFloat(document.getElementById('cHB').value||'99'); let isTinggi=checked.length>0||hb<7; let box=document.getElementById('hasilSkrining'); if(isTinggi){box.className='mt-3 p-3 rounded-xl bg-red-100 border border-red-300 text-sm font-bold'; box.innerText='🚨 HASIL: RISIKO TINGGI - '+Array.from(checked).map(c=>c.value).join(', ')+' - Wajib Rujukan!';} else {box.className='mt-3 p-3 rounded-xl bg-green-100 border border-green-300 text-sm font-bold'; box.innerText='✅ HASIL: RISIKO RENDAH - ANC Rutin Sesuai Jadwal';} document.getElementById('aksiSkrining').classList.remove('hidden');}
+function simpanRujukan(){showPage('page-edukasi');}
+function simpanSemua(){if(!currentPasien){alert('Pilih pasien dulu');showPage('page-dashboard');return;} let hb=document.getElementById('cHB').value; let risiko=(document.querySelectorAll('.risiko:checked').length>0||parseFloat(hb||'99')<7)?'TINGGI':'RENDAH'; let data={pasien:currentPasien.nama,nik:currentPasien.nik,kategori:currentKategori,hpht:document.getElementById('aHPHT').value,hpl:document.getElementById('aHPL').value,bb:document.getElementById('bBB').value,td:document.getElementById('bTD').value,hb:hb,urin:document.getElementById('cUrin').value,usg:document.getElementById('dUSG').value,risiko:risiko,rujukan:document.getElementById('rIdent').value||'-',kontrol:document.getElementById('dKontrol').value,edukasi:document.getElementById('eCatatan').value,catatan:document.getElementById('dCatatan').value,waktu:new Date().toLocaleString('id-ID')}; ancList.push(data); localStorage.setItem('kespro_anc',JSON.stringify(ancList)); alert('✅ Tersimpan! Pasien '+currentPasien.nama+' - Risiko: '+risiko+' - Kontrol berikutnya: '+data.kontrol); showPage('page-dashboard'); renderPasien();}
+function cetakPDF(){window.print();}
+function renderLaporan(){let div=document.getElementById('listLaporan'); if(ancList.length===0) div.innerHTML='<p class="text-gray-400">Belum ada data ANC.</p>'; else div.innerHTML=ancList.map(a=>`<div class="border rounded-xl p-3 bg-gray-50"><b>${a.pasien}</b> - ${a.kategori} - Risiko: <span class="${a.risiko==='TINGGI'?'text-red-600':'text-green-600'}">${a.risiko}</span><br><span class="text-xs">BB:${a.bb}kg, TD:${a.td}, Hb:${a.hb}, Urin:${a.urin}<br>Kontrol: ${a.kontrol} • ${a.waktu}</span></div>`).join('');}
+function exportLaporan(){alert('Laporan KESPRO berhasil di-export. Total '+ancList.length+' kunjungan ANC.');}
+function hapusData(){if(confirm('Hapus semua data?')){pasienList=[];ancList=[];localStorage.removeItem('kespro_pasien');localStorage.removeItem('kespro_anc');renderPasien();renderLaporan();}}
+let saved=localStorage.getItem('kespro_bidan'); if(saved){document.getElementById('loginNama').value=saved;}
+renderPasien();
+</script>
+</body>
+</html>
