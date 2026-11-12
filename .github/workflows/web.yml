@@ -10,6 +10,10 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,12 +23,11 @@ jobs:
         with:
           channel: 'stable'
       - run: flutter pub get
-            - run: flutter create . --platforms web
-  - run: flutter build web --release --base-href /kespro-app/
+      - run: flutter create . --platforms web
+      - run: flutter build web --release --base-href /kespro-app/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: build/web
-
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -32,5 +35,5 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/deploy-pages@v4
-        id: deployment
+      - id: deployment
+        uses: actions/deploy-pages@v4
